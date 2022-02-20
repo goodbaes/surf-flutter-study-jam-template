@@ -19,15 +19,6 @@ class ChatRepositoryFirebase implements ChatRepository {
 
   get name => _savedLocalName;
 
-  setName(String name) {
-    try {
-      _validateName(name);
-      _savedLocalName = name;
-    } catch (e) {
-      log(e.toString());
-    }
-  }
-
   @override
   Future<List<ChatMessageDto>> get messages async {
     final result = await _firebaseClient

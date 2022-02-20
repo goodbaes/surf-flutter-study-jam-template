@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -32,11 +34,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   bool showBottomTextField = false;
   bool showTopTextField = false;
+  bool isMessageSandingProccess = false;
 
-  get nickName => chatRepository.name;
+  String nickName = '';
 
   setNickName(name) {
-    chatRepository.setName(name);
+    nickName = (name);
   }
 
   final FocusNode nickNode = FocusNode();
@@ -57,21 +60,28 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void onMessageSend() async {
-    await chatRepository.sendMessage(nickName, messageController.text);
+    try {
+      setState(() {
+        isMessageSandingProccess = true;
+      });
+      await chatRepository.sendMessage(nickName, messageController.text);
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      setState(() {
+        showBottomTextField = false;
+        showTopTextField = false;
+        isMessageSandingProccess = false;
+      });
 
-    setState(() {
-      showBottomTextField = false;
-      showTopTextField = false;
-    });
-    messageController.clear();
-    FocusManager.instance.primaryFocus?.unfocus();
+      messageController.clear();
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton:
-          showBottomTextField ? const SizedBox() : _buildFAB(),
       appBar: _buildAppBar(),
       body: _buildContent(),
     );
@@ -107,13 +117,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   future: messages,
                 ),
               ),
-              _buildAnimatedTextField(
-                  showBottomTextField,
-                  MyTextForm(
-                    focusNode: messageNode,
-                    onTap: () => onMessageSend(),
-                    controller: messageController,
-                  )),
+              MyTextForm(
+                isLoading: isMessageSandingProccess,
+                focusNode: messageNode,
+                onTap: () => onMessageSend(),
+                controller: messageController,
+              )
             ],
           ),
           _buildAnimatedTextField(

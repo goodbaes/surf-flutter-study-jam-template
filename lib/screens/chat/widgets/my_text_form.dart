@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:surf_practice_chat_flutter/widgets/my_progress_indicator.dart';
 
 class MyTextForm extends StatelessWidget {
-  const MyTextForm({
-    this.controller,
-    this.onTap,
-    Key? key,
-    this.hintText = 'Your Massage',
-    this.borderRadius = borderRadiusTop,
-    this.color = Colors.amber,
-    this.focusNode,
-  }) : super(key: key);
+  const MyTextForm(
+      {this.controller,
+      this.onTap,
+      Key? key,
+      this.hintText = 'Your Massage',
+      this.borderRadius = borderRadiusTop,
+      this.color = Colors.amber,
+      this.focusNode,
+      this.isLoading = false})
+      : super(key: key);
 
-  const MyTextForm.top({
-    this.focusNode,
-    this.controller,
-    this.onTap,
-    Key? key,
-    this.hintText = 'Your Nickname',
-    this.color = Colors.amber,
-    this.borderRadius = borderRadiusBottom,
-  }) : super(key: key);
+  const MyTextForm.top(
+      {this.focusNode,
+      this.controller,
+      this.onTap,
+      Key? key,
+      this.hintText = 'Your Nickname',
+      this.color = Colors.amber,
+      this.borderRadius = borderRadiusBottom,
+      this.isLoading = false})
+      : super(key: key);
 
   final FocusNode? focusNode;
   final String hintText;
@@ -27,6 +30,7 @@ class MyTextForm extends StatelessWidget {
   final BorderRadius? borderRadius;
   final Function()? onTap;
   final TextEditingController? controller;
+  final bool isLoading;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -51,7 +55,9 @@ class MyTextForm extends StatelessWidget {
                   onTap: () {
                     onTap?.call();
                   },
-                  child: const Icon(Icons.send),
+                  child: isLoading
+                      ? const MyProgressIdicator()
+                      : const Icon(Icons.send),
                 ),
               ),
             ),
