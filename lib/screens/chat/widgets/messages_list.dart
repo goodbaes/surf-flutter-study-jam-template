@@ -11,9 +11,19 @@ class MessegesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      physics: const BouncingScrollPhysics(),
-      itemCount: messages.length,
-      itemBuilder: (context, index) => MessageItem(message: messages[index]),
-    );
+        physics: const BouncingScrollPhysics(),
+        itemCount: messages.length,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return MessageItem(
+              message: messages[index],
+            );
+          } else {
+            return messages[index].author.name ==
+                    messages[index - 1].author.name
+                ? MessageItem.withOutAvatar(message: messages[index])
+                : MessageItem(message: messages[index]);
+          }
+        });
   }
 }

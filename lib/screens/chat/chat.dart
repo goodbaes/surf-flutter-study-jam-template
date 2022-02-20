@@ -57,6 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
       showBottomTextField = false;
       showTopTextField = false;
     });
+    messageController.clear();
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
