@@ -83,17 +83,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void sendGeo() async {
-    setState(() {
-      isMessageSandingProccess = true;
-    });
     await chatRepository.sendGeolocationMessage(
       nickname: nickName,
       location: ChatGeolocationDto(latitude: 55, longitude: 55),
       message: messageController.text.isEmpty ? null : messageController.text,
     );
-    setState(() {
-      isMessageSandingProccess = false;
-    });
+    setState(() {});
   }
 
   @override

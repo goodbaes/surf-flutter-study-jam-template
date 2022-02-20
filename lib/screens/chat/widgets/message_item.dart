@@ -22,86 +22,74 @@ class MessageItem extends StatelessWidget {
   final ChatMessageDto message;
   final bool withAvatar;
   final ChatRepositoryFirebase chatRepository;
+  get isCurrentUser => chatRepository.name == message.author.name;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(8, withAvatar ? 8 : 0, 8, 8),
-          child: Stack(
-            alignment: chatRepository.name == message.author.name
-                ? Alignment.centerRight
-                : Alignment.centerLeft,
-            children: <Widget>[
-              Visibility(
-                visible: withAvatar,
-                child: Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.deepPurple,
-                    maxRadius: 35,
-                    child: Text(
-                      message.author.name.substring(0, 1),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(8, withAvatar ? 8 : 0, 8, 8),
+      child: Row(
+        children: <Widget>[
+          !isCurrentUser ? _buildAvatar() : SizedBox(),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      child: message is ChatMessageGeolocationDto
+                          ? _buildGeo(context)
+                          : _buildMsg(context),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                child: Row(
-                  children: [
-                    const SizedBox(
-                      width: 70,
-                    ),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                          child: message is ChatMessageGeolocationDto
-                              ? _buildGeo(context)
-                              : _buildMsg(context),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
+          isCurrentUser ? _buildAvatar() : SizedBox(),
+        ],
+      ),
+    );
+  }
+
+  Padding _buildAvatar() {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: CircleAvatar(
+        backgroundColor: Colors.deepPurple,
+        maxRadius: 35,
+        child: Text(
+          message.author.name.substring(0, 1),
         ),
-      ],
+      ),
     );
   }
 
   Widget _buildGeo(context) {
     final messageGeo = (message as ChatMessageGeolocationDto).location;
-    return SizedBox(
-      width: MediaQuery.of(context).size.width / 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            message.author.name,
-            style: const TextStyle(fontWeight: FontWeight.w900),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAuthorName(),
+        const FittedBox(
+          child: Text(
+            'поделился своей геолокацией',
           ),
-          const FittedBox(
-            child: Text(
-              'поделился своей геолокацией',
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          TextButton(
-              onPressed: () {
-                MapsLauncher.launchCoordinates(
-                    messageGeo.latitude, messageGeo.longitude);
-              },
-              child: const Text('Показать на карте')),
-          if (message.message.isNotEmpty) _buildMassageText(context),
-        ],
-      ),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        TextButton(
+            onPressed: () {
+              MapsLauncher.launchCoordinates(
+                  messageGeo.latitude, messageGeo.longitude);
+            },
+            child: const Text('Показать на карте')),
+        if (message.message.isNotEmpty) _buildMassageText(context),
+      ],
     );
   }
 
@@ -111,14 +99,18 @@ class MessageItem extends StatelessWidget {
       children: [
         Visibility(
           visible: withAvatar,
-          child: Text(
-            message.author.name,
-            style: const TextStyle(fontStyle: FontStyle.italic),
-            textAlign: TextAlign.start,
-          ),
+          child: _buildAuthorName(),
         ),
         _buildMassageText(context),
       ],
+    );
+  }
+
+  Text _buildAuthorName() {
+    return Text(
+      message.author.name,
+      style: const TextStyle(fontStyle: FontStyle.italic),
+      textAlign: TextAlign.start,
     );
   }
 
@@ -127,11 +119,9 @@ class MessageItem extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.6,
-        child: Flexible(
-          child: Text(
-            message.message,
-            style: const TextStyle(fontSize: 18),
-          ),
+        child: Text(
+          message.message,
+          style: const TextStyle(fontSize: 18),
         ),
       ),
     );
