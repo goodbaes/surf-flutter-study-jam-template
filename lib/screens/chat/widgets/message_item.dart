@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:surf_practice_chat_flutter/data/chat/chat.dart';
 import 'package:surf_practice_chat_flutter/data/chat/models/message.dart';
+import 'package:surf_practice_chat_flutter/data/chat/repository/firebase.dart';
 
 class MessageItem extends StatelessWidget {
-  const MessageItem({required this.message, Key? key, this.withAvatar = true})
-      : super(key: key);
-  const MessageItem.withOutAvatar(
-      {required this.message, Key? key, this.withAvatar = false})
-      : super(key: key);
+  const MessageItem({
+    required this.message,
+    required this.chatRepository,
+    Key? key,
+    this.withAvatar = true,
+  }) : super(key: key);
+
+  const MessageItem.withOutAvatar({
+    required this.message,
+    required this.chatRepository,
+    key,
+    this.withAvatar = false,
+  }) : super(key: key);
+
   final ChatMessageDto message;
   final bool withAvatar;
+  final ChatRepositoryFirebase chatRepository;
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.fromLTRB(8, withAvatar ? 8 : 0, 8, 8),
           child: Stack(
+            alignment: chatRepository.name == message.author.name
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
             children: <Widget>[
               Visibility(
                 visible: withAvatar,

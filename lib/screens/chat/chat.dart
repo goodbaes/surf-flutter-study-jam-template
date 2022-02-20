@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:surf_practice_chat_flutter/data/chat/models/message.dart';
 import 'package:surf_practice_chat_flutter/data/chat/repository/firebase.dart';
 
@@ -26,13 +27,17 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final chatRepository = ChatRepositoryFirebase(FirebaseFirestore.instance);
+  final chatRepository = GetIt.instance.get<ChatRepositoryFirebase>();
   Future<List<ChatMessageDto>> get messages => chatRepository.messages;
 
   bool showBottomTextField = false;
   bool showTopTextField = false;
 
-  var nickName = 'nickName';
+  get nickName => chatRepository.name;
+
+  setNickName(name) {
+    chatRepository.setName(name);
+  }
 
   final FocusNode nickNode = FocusNode();
 
@@ -43,11 +48,12 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController messageController = TextEditingController();
 
   void onSaveNick() async {
+    setNickName(nickController.text);
+
     setState(() {
-      nickName = nickController.text;
       showTopTextField = false;
-      FocusManager.instance.primaryFocus?.unfocus();
     });
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   void onMessageSend() async {
@@ -75,13 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Center(
       child: Stack(
         children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Image.network(
-              texture,
-              fit: BoxFit.fitHeight,
-            ),
-          ),
+          _buildTextureBackground(),
           Column(
             children: <Widget>[
               Expanded(
@@ -97,7 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         data == null) {
                       return const Center(child: MyProgressIdicator());
                     } else if (snapshot.data != null && snapshot.hasData) {
-                      return _buildSuccess(data);
+                      return _buildSuccess(data.reversed.toList());
                     } else if (data.isEmpty) {
                       _buildEmpty();
                     }
@@ -128,7 +128,17 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  FloatingActionButton _buildFAB() {
+  Widget _buildTextureBackground() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height,
+      child: Image.network(
+        texture,
+        fit: BoxFit.fitHeight,
+      ),
+    );
+  }
+
+  Widget _buildFAB() {
     return FloatingActionButton(
       onPressed: () {
         setState(() {
@@ -170,7 +180,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  AnimatedContainer _buildAnimatedTextField(bool isVisible, Widget child) {
+  Widget _buildAnimatedTextField(bool isVisible, Widget child) {
     return AnimatedContainer(
         height: isVisible ? 70 : 0,
         duration: const Duration(milliseconds: 200),

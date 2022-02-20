@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:surf_practice_chat_flutter/data/chat/models/geolocation.dart';
@@ -13,7 +15,18 @@ class ChatRepositoryFirebase implements ChatRepository {
 
   ChatRepositoryFirebase(this._firebaseClient);
 
-  var _savedLocalName = '';
+  var _savedLocalName = 'nickName';
+
+  get name => _savedLocalName;
+
+  setName(String name) {
+    try {
+      _validateName(name);
+      _savedLocalName = name;
+    } catch (e) {
+      log(e.toString());
+    }
+  }
 
   @override
   Future<List<ChatMessageDto>> get messages async {
