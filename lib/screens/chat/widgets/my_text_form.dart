@@ -8,9 +8,11 @@ class MyTextForm extends StatelessWidget {
     this.hintText = 'Your Massage',
     this.borderRadius = borderRadiusTop,
     this.color = Colors.amber,
+    this.focusNode,
   }) : super(key: key);
 
   const MyTextForm.top({
+    this.focusNode,
     this.controller,
     this.onTap,
     Key? key,
@@ -19,6 +21,7 @@ class MyTextForm extends StatelessWidget {
     this.borderRadius = borderRadiusBottom,
   }) : super(key: key);
 
+  final FocusNode? focusNode;
   final String hintText;
   final Color color;
   final BorderRadius? borderRadius;
@@ -37,6 +40,7 @@ class MyTextForm extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: TextFormField(
+              focusNode: focusNode,
               autofocus: true,
               controller: controller,
               style: const TextStyle(fontSize: 18),

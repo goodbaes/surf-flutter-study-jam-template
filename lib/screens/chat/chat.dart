@@ -34,6 +34,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   var nickName = 'nickName';
 
+  final FocusNode nickNode = FocusNode();
+
+  final FocusNode messageNode = FocusNode();
+
   final TextEditingController nickController = TextEditingController();
 
   final TextEditingController messageController = TextEditingController();
@@ -49,13 +53,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void onMessageSend() async {
-    await chatRepository.sendMessage(nickName, messageController.text);
-    messageController.clear();
+    FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       showBottomTextField = false;
       showTopTextField = false;
     });
-    FocusManager.instance.primaryFocus?.unfocus();
+
+    await chatRepository.sendMessage(nickName, messageController.text);
+    messageController.clear();
   }
 
   @override
@@ -112,6 +117,7 @@ class _ChatScreenState extends State<ChatScreen> {
               _buildAnimatedTextField(
                   showBottomTextField,
                   MyTextForm(
+                    focusNode: messageNode,
                     onTap: () => onMessageSend(),
                     controller: messageController,
                   )),
@@ -120,6 +126,7 @@ class _ChatScreenState extends State<ChatScreen> {
           _buildAnimatedTextField(
               showTopTextField,
               MyTextForm.top(
+                focusNode: nickNode,
                 onTap: () => onSaveNick(),
                 controller: nickController,
               )),
@@ -134,6 +141,7 @@ class _ChatScreenState extends State<ChatScreen> {
         setState(() {
           nickController.text = nickName;
           showBottomTextField = !showBottomTextField;
+          messageNode.requestFocus();
         });
       },
       child: const Icon(Icons.send),
@@ -149,6 +157,9 @@ class _ChatScreenState extends State<ChatScreen> {
               nickController.text = nickName;
               showTopTextField = !showTopTextField;
             });
+            if (showTopTextField) {
+              nickNode.requestFocus();
+            }
           },
           child: const Text(
             'Edit Nickname',
