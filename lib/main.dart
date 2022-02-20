@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:surf_practice_chat_flutter/data/chat/repository/firebase.dart';
+import 'package:surf_practice_chat_flutter/data/chat/repository/geolocator.dart';
 import 'package:surf_practice_chat_flutter/firebase_options.dart';
 import 'package:surf_practice_chat_flutter/screens/chat/chat.dart';
 
@@ -27,14 +28,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatRepository = ChatRepositoryFirebase(FirebaseFirestore.instance);
-
+    final chatRepository = GetIt.instance.get<ChatRepositoryFirebase>();
+    final geoRepository = GeolocatorImpl();
     return MaterialApp(
       theme: ThemeData(
         colorSchemeSeed: Colors.deepPurple,
         useMaterial3: true,
       ),
       home: ChatScreen(
+        geoRepository: geoRepository,
         chatRepository: chatRepository,
       ),
     );

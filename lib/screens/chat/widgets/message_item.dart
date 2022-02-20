@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:surf_practice_chat_flutter/data/chat/chat.dart';
 import 'package:surf_practice_chat_flutter/data/chat/models/message.dart';
 import 'package:surf_practice_chat_flutter/data/chat/repository/firebase.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 
 class MessageItem extends StatelessWidget {
   const MessageItem({
@@ -58,33 +58,9 @@ class MessageItem extends StatelessWidget {
                         color: Colors.white,
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Visibility(
-                                visible: withAvatar,
-                                child: Text(
-                                  message.author.name,
-                                  style: const TextStyle(
-                                      fontStyle: FontStyle.italic),
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.6,
-                                  child: Flexible(
-                                    child: Text(
-                                      message.message,
-                                      style: const TextStyle(fontSize: 18),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                          child: message is ChatMessageGeolocationDto
+                              ? _buildGeo(context)
+                              : _buildMsg(context),
                         ),
                       ),
                     ),
@@ -95,6 +71,69 @@ class MessageItem extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildGeo(context) {
+    final messageGeo = (message as ChatMessageGeolocationDto).location;
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            message.author.name,
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+          const FittedBox(
+            child: Text(
+              'поделился своей геолокацией',
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          TextButton(
+              onPressed: () {
+                MapsLauncher.launchCoordinates(
+                    messageGeo.latitude, messageGeo.longitude);
+              },
+              child: const Text('Показать на карте')),
+          if (message.message.isNotEmpty) _buildMassageText(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMsg(context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Visibility(
+          visible: withAvatar,
+          child: Text(
+            message.author.name,
+            style: const TextStyle(fontStyle: FontStyle.italic),
+            textAlign: TextAlign.start,
+          ),
+        ),
+        _buildMassageText(context),
+      ],
+    );
+  }
+
+  Padding _buildMassageText(context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.6,
+        child: Flexible(
+          child: Text(
+            message.message,
+            style: const TextStyle(fontSize: 18),
+          ),
+        ),
+      ),
     );
   }
 }

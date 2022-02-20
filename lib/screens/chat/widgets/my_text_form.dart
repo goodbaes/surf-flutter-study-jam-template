@@ -2,27 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:surf_practice_chat_flutter/widgets/my_progress_indicator.dart';
 
 class MyTextForm extends StatelessWidget {
-  const MyTextForm(
-      {this.controller,
-      this.onTap,
-      Key? key,
-      this.hintText = 'Your Massage',
-      this.borderRadius = borderRadiusTop,
-      this.color = Colors.amber,
-      this.focusNode,
-      this.isLoading = false})
-      : super(key: key);
+  const MyTextForm({
+    this.controller,
+    this.onTap,
+    this.focusNode,
+    Key? key,
+    this.hintText = 'Your Massage',
+    this.borderRadius = borderRadiusTop,
+    this.color = Colors.amber,
+    this.showGeoButton = true,
+    this.isLoading = false,
+    this.onTapGeo,
+  }) : super(key: key);
 
-  const MyTextForm.top(
-      {this.focusNode,
-      this.controller,
-      this.onTap,
-      Key? key,
-      this.hintText = 'Your Nickname',
-      this.color = Colors.amber,
-      this.borderRadius = borderRadiusBottom,
-      this.isLoading = false})
-      : super(key: key);
+  const MyTextForm.top({
+    this.focusNode,
+    this.controller,
+    this.onTap,
+    Key? key,
+    this.hintText = 'Your Nickname',
+    this.color = Colors.amber,
+    this.borderRadius = borderRadiusBottom,
+    this.showGeoButton = false,
+    this.isLoading = false,
+    this.onTapGeo,
+  }) : super(key: key);
 
   final FocusNode? focusNode;
   final String hintText;
@@ -31,6 +35,9 @@ class MyTextForm extends StatelessWidget {
   final Function()? onTap;
   final TextEditingController? controller;
   final bool isLoading;
+  final bool showGeoButton;
+  final Function()? onTapGeo;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -43,28 +50,52 @@ class MyTextForm extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: TextFormField(
-              focusNode: focusNode,
-              autofocus: true,
-              controller: controller,
-              style: const TextStyle(fontSize: 18),
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(borderSide: BorderSide.none),
-                hintText: hintText,
-                suffix: InkWell(
-                  onTap: () {
-                    onTap?.call();
-                  },
-                  child: isLoading
-                      ? const MyProgressIdicator()
-                      : const Icon(Icons.send),
+            child: Row(
+              children: [
+                _buildGeoButton(),
+                Expanded(
+                  child: TextFormField(
+                    focusNode: focusNode,
+                    autofocus: true,
+                    controller: controller,
+                    style: const TextStyle(fontSize: 18),
+                    decoration: InputDecoration(
+                      border:
+                          const OutlineInputBorder(borderSide: BorderSide.none),
+                      hintText: hintText,
+                      suffix: InkWell(
+                        onTap: () {
+                          onTap?.call();
+                        },
+                        child: isLoading
+                            ? const MyProgressIdicator()
+                            : const Icon(Icons.send),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildGeoButton() {
+    return showGeoButton
+        ? InkWell(
+            onTap: () {
+              onTapGeo?.call();
+            },
+            child: isLoading
+                ? const MyProgressIdicator()
+                : const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.share_location_outlined),
+                  ),
+          )
+        : const SizedBox();
   }
 }
 

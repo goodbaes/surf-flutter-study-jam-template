@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:surf_practice_chat_flutter/data/chat/models/message.dart';
+import 'package:surf_practice_chat_flutter/data/chat/chat.dart';
 import 'package:surf_practice_chat_flutter/data/chat/repository/firebase.dart';
+import 'package:surf_practice_chat_flutter/data/chat/repository/geolocator_repository.dart';
 
-import 'package:surf_practice_chat_flutter/data/chat/repository/repository.dart';
 import 'package:surf_practice_chat_flutter/screens/chat/widgets/messages_list.dart';
 import 'package:surf_practice_chat_flutter/screens/chat/widgets/my_text_form.dart';
 import 'package:surf_practice_chat_flutter/widgets/my_progress_indicator.dart';
@@ -19,9 +17,10 @@ const texture =
 /// Chat screen templete. This is your starting point.
 class ChatScreen extends StatefulWidget {
   final ChatRepository chatRepository;
-
+  final GeolocatorRepository geoRepository;
   const ChatScreen({
     Key? key,
+    required this.geoRepository,
     required this.chatRepository,
   }) : super(key: key);
 
@@ -30,9 +29,16 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final chatRepository = GetIt.instance.get<ChatRepositoryFirebase>();
-  Future<List<ChatMessageDto>> get messages => chatRepository.messages;
+  onInit() {
+    chatRepository = widget.chatRepository;
+    geoRepository = widget.geoRepository;
+  }
 
+  late final ChatRepository chatRepository;
+  late final GeolocatorRepository geoRepository;
+
+  Future<List<ChatMessageDto>> get messages => chatRepository.messages;
+  Future<ChatGeolocationDto> get location => geoRepository.getGeo();
   bool showBottomTextField = false;
   bool showTopTextField = false;
   bool isMessageSandingProccess = false;
@@ -83,6 +89,15 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  void sendGeo() async {
+    await chatRepository.sendGeolocationMessage(
+      nickname: nickName,
+      location: ChatGeolocationDto(latitude: 55, longitude: 55),
+      message: messageController.text.isEmpty ? null : messageController.text,
+    );
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,6 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
               MyTextForm(
+                onTapGeo: () => sendGeo(),
                 isLoading: isMessageSandingProccess,
                 focusNode: messageNode,
                 onTap: () => onMessageSend(),
@@ -148,19 +164,6 @@ class _ChatScreenState extends State<ChatScreen> {
         texture,
         fit: BoxFit.fitHeight,
       ),
-    );
-  }
-
-  Widget _buildFAB() {
-    return FloatingActionButton(
-      onPressed: () {
-        setState(() {
-          nickController.text = nickName;
-          showBottomTextField = !showBottomTextField;
-          messageNode.requestFocus();
-        });
-      },
-      child: const Icon(Icons.send),
     );
   }
 
