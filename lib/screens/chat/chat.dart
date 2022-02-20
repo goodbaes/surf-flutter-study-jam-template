@@ -42,8 +42,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final TextEditingController messageController = TextEditingController();
 
-  final List<ChatMessageDto> previouseMessageList = [];
-
   void onSaveNick() async {
     setState(() {
       nickName = nickController.text;
@@ -53,14 +51,13 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void onMessageSend() async {
-    FocusManager.instance.primaryFocus?.unfocus();
+    await chatRepository.sendMessage(nickName, messageController.text);
+
     setState(() {
       showBottomTextField = false;
       showTopTextField = false;
     });
-
-    await chatRepository.sendMessage(nickName, messageController.text);
-    messageController.clear();
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   @override
@@ -97,13 +94,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       return _buildListError(snapshot);
                     } else if (state == ConnectionState.waiting ||
                         data == null) {
-                      if (previouseMessageList.isNotEmpty) {
-                        return _buildSuccess(previouseMessageList);
-                      }
                       return const Center(child: MyProgressIdicator());
                     } else if (snapshot.data != null && snapshot.hasData) {
-                      previouseMessageList.clear();
-                      previouseMessageList.addAll(data);
                       return _buildSuccess(data);
                     } else if (data.isEmpty) {
                       _buildEmpty();
@@ -168,7 +160,6 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         IconButton(
             onPressed: (() {
-              previouseMessageList.clear();
               setState(() {});
             }),
             icon: const Icon(Icons.refresh))
