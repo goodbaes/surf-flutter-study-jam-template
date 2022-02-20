@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:surf_practice_chat_flutter/data/chat/chat.dart';
-import 'package:surf_practice_chat_flutter/data/chat/repository/firebase.dart';
 import 'package:surf_practice_chat_flutter/data/chat/repository/geolocator_repository.dart';
 
 import 'package:surf_practice_chat_flutter/screens/chat/widgets/messages_list.dart';
@@ -29,11 +27,6 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  onInit() {
-    chatRepository = widget.chatRepository;
-    geoRepository = widget.geoRepository;
-  }
-
   late final ChatRepository chatRepository;
   late final GeolocatorRepository geoRepository;
 
@@ -90,12 +83,24 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void sendGeo() async {
+    setState(() {
+      isMessageSandingProccess = true;
+    });
     await chatRepository.sendGeolocationMessage(
       nickname: nickName,
       location: ChatGeolocationDto(latitude: 55, longitude: 55),
       message: messageController.text.isEmpty ? null : messageController.text,
     );
-    setState(() {});
+    setState(() {
+      isMessageSandingProccess = false;
+    });
+  }
+
+  @override
+  void initState() {
+    chatRepository = widget.chatRepository;
+    geoRepository = widget.geoRepository;
+    super.initState();
   }
 
   @override
