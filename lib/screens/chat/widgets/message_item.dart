@@ -6,12 +6,48 @@ class MessageItem extends StatelessWidget {
   final ChatMessageDto message;
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        child: Text(message.author.name.substring(0, 1)),
-      ),
-      title: Text(message.author.name),
-      subtitle: Text(message.message),
+    return Stack(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            backgroundColor: Colors.deepPurple,
+            maxRadius: 35,
+            child: Text(
+              message.author.name.substring(0, 1),
+            ),
+          ),
+        ),
+        Row(
+          children: [
+            const SizedBox(
+              width: 70,
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      message.author.name,
+                      style: const TextStyle(fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.start,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        message.message,
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

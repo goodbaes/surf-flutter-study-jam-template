@@ -9,6 +9,9 @@ import 'package:surf_practice_chat_flutter/screens/chat/widgets/messages_list.da
 import 'package:surf_practice_chat_flutter/screens/chat/widgets/my_text_form.dart';
 import 'package:surf_practice_chat_flutter/widgets/my_progress_indicator.dart';
 
+const texture =
+    'https://media.istockphoto.com/vectors/paper-texture-background-vector-id1199971584';
+
 /// Chat screen templete. This is your starting point.
 class ChatScreen extends StatefulWidget {
   final ChatRepository chatRepository;
@@ -40,6 +43,8 @@ class _ChatScreenState extends State<ChatScreen> {
   void onSaveNick() async {
     setState(() {
       nickName = nickController.text;
+      showTopTextField = false;
+      FocusManager.instance.primaryFocus?.unfocus();
     });
   }
 
@@ -59,55 +64,66 @@ class _ChatScreenState extends State<ChatScreen> {
       floatingActionButton:
           showBottomTextField ? const SizedBox() : _buildFAB(),
       appBar: _buildAppBar(),
-      body: Center(
-        child: Stack(
-          children: [
-            Column(
-              children: <Widget>[
-                Expanded(
-                  child: FutureBuilder<List<ChatMessageDto>>(
-                    initialData: const [],
-                    builder: (context, snapshot) {
-                      final data = snapshot.data;
-                      final state = snapshot.connectionState;
+      body: _buildContent(),
+    );
+  }
 
-                      if (snapshot.hasError) {
-                        return _buildListError(snapshot);
-                      } else if (state == ConnectionState.waiting ||
-                          data == null) {
-                        if (previouseMessageList.isNotEmpty) {
-                          return _buildSuccess(previouseMessageList);
-                        }
-                        return const Center(child: MyProgressIdicator());
-                      } else if (snapshot.data != null && snapshot.hasData) {
-                        previouseMessageList.clear();
-                        previouseMessageList.addAll(data);
-                        return _buildSuccess(data);
-                      } else if (data.isEmpty) {
-                        _buildEmpty();
-                      }
-
-                      return const Center(child: MyProgressIdicator());
-                    },
-                    future: messages,
-                  ),
-                ),
-                _buildAnimatedTextField(
-                    showBottomTextField,
-                    MyTextForm(
-                      onTap: () => onMessageSend(),
-                      controller: messageController,
-                    )),
-              ],
+  Widget _buildContent() {
+    return Center(
+      child: Stack(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Image.network(
+              texture,
+              fit: BoxFit.fitHeight,
             ),
-            _buildAnimatedTextField(
-                showTopTextField,
-                MyTextForm.top(
-                  onTap: () => onSaveNick(),
-                  controller: nickController,
-                )),
-          ],
-        ),
+          ),
+          Column(
+            children: <Widget>[
+              Expanded(
+                child: FutureBuilder<List<ChatMessageDto>>(
+                  initialData: const [],
+                  builder: (context, snapshot) {
+                    final data = snapshot.data;
+                    final state = snapshot.connectionState;
+
+                    if (snapshot.hasError) {
+                      return _buildListError(snapshot);
+                    } else if (state == ConnectionState.waiting ||
+                        data == null) {
+                      if (previouseMessageList.isNotEmpty) {
+                        return _buildSuccess(previouseMessageList);
+                      }
+                      return const Center(child: MyProgressIdicator());
+                    } else if (snapshot.data != null && snapshot.hasData) {
+                      previouseMessageList.clear();
+                      previouseMessageList.addAll(data);
+                      return _buildSuccess(data);
+                    } else if (data.isEmpty) {
+                      _buildEmpty();
+                    }
+
+                    return const Center(child: MyProgressIdicator());
+                  },
+                  future: messages,
+                ),
+              ),
+              _buildAnimatedTextField(
+                  showBottomTextField,
+                  MyTextForm(
+                    onTap: () => onMessageSend(),
+                    controller: messageController,
+                  )),
+            ],
+          ),
+          _buildAnimatedTextField(
+              showTopTextField,
+              MyTextForm.top(
+                onTap: () => onSaveNick(),
+                controller: nickController,
+              )),
+        ],
       ),
     );
   }
