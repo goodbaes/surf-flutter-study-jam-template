@@ -16,13 +16,15 @@ class MessegesList extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         itemCount: messages.length,
         itemBuilder: (context, index) {
-          final messageItem = MessageItem(
+          messageItem(bool condition) => MessageItem(
               message: messages[index],
               chatRepository: GetIt.instance.get<ChatRepositoryFirebase>(),
-              withAvatar: messages[index].author.name !=
-                  messages[index - 1].author.name);
+              withAvatar: condition);
 
-          return messageItem;
+          return index == 0
+              ? messageItem(true)
+              : messageItem(messages[index].author.name !=
+                  messages[index - 1].author.name);
         });
   }
 }
