@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,6 +43,8 @@ class _ChatScreenState extends State<ChatScreen> {
     nickName = (name);
   }
 
+  final ScrollController scrollController = ScrollController();
+
   final FocusNode nickNode = FocusNode();
 
   final FocusNode messageNode = FocusNode();
@@ -56,6 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       showTopTextField = false;
     });
+
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
@@ -107,7 +111,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         data == null) {
                       return const Center(child: MyProgressIdicator());
                     } else if (snapshot.data != null && snapshot.hasData) {
-                      return _buildSuccess(data.reversed.toList());
+                      return _buildSuccess(data);
                     } else if (data.isEmpty) {
                       _buildEmpty();
                     }
@@ -198,7 +202,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildSuccess(List<ChatMessageDto> data) =>
-      MessegesList(messages: data);
+      MessegesList(scrollController, messages: data);
 
   Widget _buildEmpty() => const Text('Empty List');
 

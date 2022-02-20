@@ -5,14 +5,17 @@ import 'package:surf_practice_chat_flutter/data/chat/repository/firebase.dart';
 import 'package:surf_practice_chat_flutter/screens/chat/widgets/message_item.dart';
 
 class MessegesList extends StatelessWidget {
-  const MessegesList({
+  const MessegesList(
+    this.controller, {
     required this.messages,
     Key? key,
   }) : super(key: key);
+  final ScrollController controller;
   final List<ChatMessageDto> messages;
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+        controller: controller,
         physics: const BouncingScrollPhysics(),
         itemCount: messages.length,
         itemBuilder: (context, index) {
