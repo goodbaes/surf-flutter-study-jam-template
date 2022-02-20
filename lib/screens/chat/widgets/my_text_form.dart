@@ -6,10 +6,7 @@ class MyTextForm extends StatelessWidget {
     this.onTap,
     Key? key,
     this.hintText = 'Your Massage',
-    this.borderRadius = const BorderRadius.only(
-      topLeft: Radius.circular(20),
-      topRight: Radius.circular(20),
-    ),
+    this.borderRadius = borderRadiusTop,
     this.color = Colors.amber,
   }) : super(key: key);
 
@@ -19,10 +16,7 @@ class MyTextForm extends StatelessWidget {
     Key? key,
     this.hintText = 'Your Nickname',
     this.color = Colors.amber,
-    this.borderRadius = const BorderRadius.only(
-      bottomLeft: Radius.circular(20),
-      bottomRight: Radius.circular(20),
-    ),
+    this.borderRadius = borderRadiusBottom,
   }) : super(key: key);
 
   final String hintText;
@@ -43,6 +37,7 @@ class MyTextForm extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: TextFormField(
+              autofocus: true,
               controller: controller,
               style: const TextStyle(fontSize: 18),
               decoration: InputDecoration(
@@ -71,3 +66,12 @@ const boxDecoration = BoxDecoration(boxShadow: [
     blurRadius: 20,
   ),
 ]);
+
+const borderRadiusTop = BorderRadius.only(
+  topLeft: Radius.circular(20),
+  topRight: Radius.circular(20),
+);
+const borderRadiusBottom = BorderRadius.only(
+  bottomLeft: Radius.circular(20),
+  bottomRight: Radius.circular(20),
+);

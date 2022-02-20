@@ -56,39 +56,9 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: showBottomTextField
-          ? const SizedBox()
-          : FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  nickController.text = nickName;
-                  showBottomTextField = !showBottomTextField;
-                });
-              },
-              child: const Icon(Icons.send),
-            ),
-      appBar: AppBar(
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                showTopTextField = !showTopTextField;
-              });
-            },
-            child: const Text(
-              'Edit Nickname',
-              style: TextStyle(color: Colors.amber),
-            ),
-          ),
-          IconButton(
-              onPressed: (() => setState(() {
-                    previouseMessageList.clear();
-                  })),
-              icon: Icon(Icons.refresh))
-        ],
-        leadingWidth: MediaQuery.of(context).size.width / 1.5,
-        title: Text(nickName),
-      ),
+      floatingActionButton:
+          showBottomTextField ? const SizedBox() : _buildFAB(),
+      appBar: _buildAppBar(),
       body: Center(
         child: Stack(
           children: [
@@ -96,7 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: <Widget>[
                 Expanded(
                   child: FutureBuilder<List<ChatMessageDto>>(
-                    initialData: [],
+                    initialData: const [],
                     builder: (context, snapshot) {
                       final data = snapshot.data;
                       final state = snapshot.connectionState;
@@ -139,6 +109,45 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  FloatingActionButton _buildFAB() {
+    return FloatingActionButton(
+      onPressed: () {
+        setState(() {
+          nickController.text = nickName;
+          showBottomTextField = !showBottomTextField;
+        });
+      },
+      child: const Icon(Icons.send),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      actions: [
+        TextButton(
+          onPressed: () {
+            setState(() {
+              nickController.text = nickName;
+              showTopTextField = !showTopTextField;
+            });
+          },
+          child: const Text(
+            'Edit Nickname',
+            style: TextStyle(color: Colors.amber),
+          ),
+        ),
+        IconButton(
+            onPressed: (() {
+              previouseMessageList.clear();
+              setState(() {});
+            }),
+            icon: const Icon(Icons.refresh))
+      ],
+      leadingWidth: MediaQuery.of(context).size.width / 1.5,
+      title: Text(nickName),
     );
   }
 
